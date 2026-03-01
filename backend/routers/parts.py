@@ -5,10 +5,10 @@ import uuid
 from datetime import datetime
 import os
 
-from ..models.part import Part, PartCreate, PartUpdate, RoutingStep
-from ..utils.auth import get_current_user
+from models.part import Part, PartCreate, PartUpdate, RoutingStep
+from utils.auth import get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix="/api/data")
 
 # MongoDB connection
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")

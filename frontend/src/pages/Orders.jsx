@@ -105,6 +105,7 @@ export default function Orders() {
                         {getPriorityLabel(order.priority)}
                       </span>
                     </td>
+                    <td>{order.start_date ? new Date(order.start_date).toLocaleDateString() : '-'}</td>
                     <td>{new Date(order.due_date).toLocaleDateString()}</td>
                     <td>
                       {order.planned_completion_date ? 

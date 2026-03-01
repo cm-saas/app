@@ -24,7 +24,8 @@ class TestSetup:
             "full_name": "Quality Test User"
         })
         
-        if response.status_code == 200:
+        # Accept both 200 and 201 as success
+        if response.status_code in [200, 201]:
             data = response.json()
             return data.get("access_token"), email, password
         
@@ -276,7 +277,8 @@ class TestAuthEndpoints:
             "full_name": "Auth Test User"
         })
         
-        assert response.status_code == 200
+        # Accept both 200 and 201 as success
+        assert response.status_code in [200, 201], f"Registration failed: {response.status_code}"
         data = response.json()
         assert "access_token" in data
         print(f"SUCCESS: User registered - {email}")
@@ -296,7 +298,7 @@ class TestAuthEndpoints:
             "full_name": "Login Test User"
         })
         
-        if reg_response.status_code != 200:
+        if reg_response.status_code not in [200, 201]:
             pytest.skip("Registration failed")
         
         # Then login

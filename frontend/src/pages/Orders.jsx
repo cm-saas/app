@@ -192,6 +192,231 @@ export default function Orders() {
   );
 }
 
+function CreateOrderModal({ workCenters, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    customer: '',
+    quantity: 100,
+    priority: 2,
+    due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days from now
+    routing: [
+      {
+        sequence_number: 1,
+        work_center_id: workCenters[0]?.id || '',
+        cycle_time_minutes: 1,
+        setup_time_hours: 0
+      }
+    ]
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Create new order
+    const newOrder = {
+      ...formData,
+      due_date: new Date(formData.due_date).toISOString(),
+      status: 'PLANNED',
+      routing: formData.routing.map(step => ({
+        ...step,
+        completion_date: null,
+        scheduled_days: [],
+        total_units_completed: 0,
+        units_in_progress: 0,
+        required_hours: 0
+      }))
+    };
+    
+    onSave(newOrder);
+  };
+
+  const updateRoutingStep = (index, field, value) => {
+    const newRouting = [...formData.routing];
+    if (field.includes('time')) {
+      const numValue = value === '' ? '' : parseFloat(value);
+      newRouting[index][field] = numValue;
+    } else {
+      newRouting[index][field] = value;
+    }
+    setFormData({ ...formData, routing: newRouting });
+  };
+
+  const addRoutingStep = () => {
+    const newRouting = [...formData.routing];
+    newRouting.push({
+      sequence_number: newRouting.length + 1,
+      work_center_id: workCenters[0]?.id || '',
+      cycle_time_minutes: 1,
+      setup_time_hours: 0
+    });
+    setFormData({ ...formData, routing: newRouting });
+  };
+
+  const removeRoutingStep = (index) => {
+    if (formData.routing.length === 1) {
+      alert('Order must have at least one routing step');
+      return;
+    }
+    const newRouting = formData.routing.filter((_, i) => i !== index);
+    // Renumber sequence
+    newRouting.forEach((step, i) => {
+      step.sequence_number = i + 1;
+    });
+    setFormData({ ...formData, routing: newRouting });
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
+        <h2 className="modal-title">Create New Order</h2>
+        <form onSubmit={handleSubmit} className="modal-form">
+          {/* Basic Info */}
+          <div className="form-group">
+            <label className="form-label">Customer</label>
+            <input
+              type="text"
+              value={formData.customer}
+              onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
+              className="form-input-modal"
+              placeholder="Customer name"
+              required
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Quantity</label>
+              <input
+                type="number"
+                value={formData.quantity}
+                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
+                className="form-input-modal"
+                required
+                min="1"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Priority</label>
+              <select
+                value={formData.priority}
+                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
+                className="form-input-modal"
+              >
+                <option value={3}>High (3)</option>
+                <option value={2}>Normal (2)</option>
+                <option value={1}>Low (1)</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Due Date</label>
+              <input
+                type="date"
+                value={formData.due_date}
+                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                className="form-input-modal"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Routing Steps */}
+          <div style={{ marginTop: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <label className="form-label" style={{ margin: 0 }}>Routing Steps</label>
+              <button
+                type="button"
+                onClick={addRoutingStep}
+                className="btn btn-ghost"
+                style={{ padding: '6px 12px', fontSize: '13px' }}
+              >
+                <Plus size={16} /> Add Step
+              </button>
+            </div>
+
+            {formData.routing.map((step, index) => (
+              <div key={index} style={{
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--radius-md)',
+                padding: '16px',
+                marginBottom: '12px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-secondary)' }}>
+                    Step {step.sequence_number}
+                  </span>
+                  {formData.routing.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeRoutingStep(index)}
+                      className="btn-icon btn-danger"
+                      style={{ padding: '4px' }}
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '12px' }}>Work Center</label>
+                    <select
+                      value={step.work_center_id}
+                      onChange={(e) => updateRoutingStep(index, 'work_center_id', e.target.value)}
+                      className="form-input-modal"
+                      style={{ fontSize: '13px' }}
+                    >
+                      {workCenters.map(wc => (
+                        <option key={wc.id} value={wc.id}>{wc.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '12px' }}>Cycle Time (min)</label>
+                    <input
+                      type="number"
+                      value={step.cycle_time_minutes}
+                      onChange={(e) => updateRoutingStep(index, 'cycle_time_minutes', e.target.value)}
+                      className="form-input-modal"
+                      style={{ fontSize: '13px' }}
+                      step="any"
+                      min="0.000001"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '12px' }}>Setup Time (hrs)</label>
+                    <input
+                      type="number"
+                      value={step.setup_time_hours}
+                      onChange={(e) => updateRoutingStep(index, 'setup_time_hours', e.target.value)}
+                      className="form-input-modal"
+                      style={{ fontSize: '13px' }}
+                      step="any"
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="btn-cancel">
+              Cancel
+            </button>
+            <button type="submit" className="btn-submit">
+              Create Order
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function EditOrderModal({ order, workCenters, onClose, onSave }) {
   const [formData, setFormData] = useState({
     customer: order.customer,

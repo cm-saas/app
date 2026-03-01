@@ -282,27 +282,8 @@ export const rebuildSchedule = (workCenters, orders) => {
   // Step 4: Flow-based scheduling
   scheduleFlowBased(workCenters, sortedOrders, lastDateStr);
   
-  // DEBUG: Print values for 15000 order after scheduleFlowBased() completes
-  sortedOrders.forEach(order => {
-    if (order.quantity === 15000) {
-      console.log('\n[BEFORE Step 5] 15000 Order:');
-      console.log(`  order.unscheduled: ${order.unscheduled}`);
-      order.routing.forEach(step => {
-        console.log(`  Step ${step.sequence_number}:`);
-        console.log(`    total_units_completed: ${step.total_units_completed}`);
-        console.log(`    completion_date: ${step.completion_date}`);
-      });
-    }
-  });
-  
   // Step 5: Calculate completion dates and delays
   sortedOrders.forEach(order => {
-    // DEBUG: Print order.unscheduled inside Step 5 loop for 15000 order
-    if (order.quantity === 15000) {
-      console.log('\n[INSIDE Step 5 Loop] 15000 Order:');
-      console.log(`  order.unscheduled (before check): ${order.unscheduled}`);
-    }
-    
     if (!order.unscheduled) {
       // Find the routing step with the highest sequence_number that completed all units
       let completedStep = null;

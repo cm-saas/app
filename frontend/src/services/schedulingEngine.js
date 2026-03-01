@@ -297,7 +297,8 @@ export const rebuildSchedule = (workCenters, orders) => {
   // DEBUG: Print values for 15000 order after scheduleFlowBased() completes
   sortedOrders.forEach(order => {
     if (order.quantity === 15000) {
-      console.log('\n[AFTER scheduleFlowBased()] 15000 Order:');
+      console.log('\n[BEFORE Step 5] 15000 Order:');
+      console.log(`  order.unscheduled: ${order.unscheduled}`);
       order.routing.forEach(step => {
         console.log(`  Step ${step.sequence_number}:`);
         console.log(`    total_units_completed: ${step.total_units_completed}`);
@@ -308,6 +309,12 @@ export const rebuildSchedule = (workCenters, orders) => {
   
   // Step 5: Calculate completion dates and delays
   sortedOrders.forEach(order => {
+    // DEBUG: Print order.unscheduled inside Step 5 loop for 15000 order
+    if (order.quantity === 15000) {
+      console.log('\n[INSIDE Step 5 Loop] 15000 Order:');
+      console.log(`  order.unscheduled (before check): ${order.unscheduled}`);
+    }
+    
     if (!order.unscheduled) {
       const lastStep = order.routing[order.routing.length - 1];
       order.planned_completion_date = lastStep.completion_date;

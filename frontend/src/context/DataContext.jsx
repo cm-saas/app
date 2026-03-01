@@ -58,24 +58,41 @@ export const DataProvider = ({ children }) => {
       return;
     }
 
-    console.log('[DataContext] Fetching work centers, orders, and parts...');
+    console.log('[DataContext] Fetching work centers, orders, parts, and production logs...');
     try {
-      const [wcsResponse, ordersResponse, partsResponse] = await Promise.all([
+      const [wcsResponse, ordersResponse, partsResponse, productionResponse] = await Promise.all([
         axios.get(`${backendUrl}/api/data/work-centers`),
         axios.get(`${backendUrl}/api/data/orders`),
-        axios.get(`${backendUrl}/api/data/parts`)
+        axios.get(`${backendUrl}/api/data/parts`),
+        axios.get(`${backendUrl}/api/data/production`)
       ]);
 
       const wcs = wcsResponse.data || [];
       const ords = ordersResponse.data || [];
       const partsList = partsResponse.data || [];
+      const prodLogs = productionResponse.data || [];
 
-      console.log('[DataContext] Fetched:', wcs.length, 'work centers,', ords.length, 'orders,', partsList.length, 'parts');
+      console.log('[DataContext] Fetched:', wcs.length, 'work centers,', ords.length, 'orders,', partsList.length, 'parts,', prodLogs.length, 'production logs');
 
       setParts(partsList);
+      setProductionLogs(prodLogs);
+
+      // Calculate actual_units_completed and remaining_quantity for each order
+      const ordersWithProduction = ords.map(order => {
+        const orderLogs = prodLogs.filter(log => log.order_id === order.id);
+        const actual_units_completed = orderLogs.reduce((sum, log) => sum + log.quantity_produced, 0);
+        const net_required = order.net_required_quantity !== undefined ? order.net_required_quantity : order.quantity;
+        const remaining_quantity = net_required - actual_units_completed;
+        
+        return {
+          ...order,
+          actual_units_completed,
+          remaining_quantity
+        };
+      });
 
       // Trigger local rebuild for scheduling
-      await triggerRebuild(wcs, ords, false, true);
+      await triggerRebuild(wcs, ordersWithProduction, false, true);
     } catch (error) {
       console.error('[DataContext] Failed to fetch data:', error.response?.status, error.message);
       

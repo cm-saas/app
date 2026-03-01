@@ -402,42 +402,6 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
               </select>
             </div>
           </div>
-              <label className="form-label">Net To Produce</label>
-              <input
-                type="number"
-                value={Math.max(0, formData.quantity - formData.available_stock)}
-                className="form-input-modal"
-                disabled
-                style={{ background: 'var(--bg-elevated)', color: 'var(--brand-primary)', fontWeight: '600' }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Priority</label>
-              <select
-                value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                className="form-input-modal"
-              >
-                <option value={3}>High (3)</option>
-                <option value={2}>Normal (2)</option>
-                <option value={1}>Low (1)</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Due Date</label>
-              <input
-                type="date"
-                value={formData.due_date}
-                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                className="form-input-modal"
-                required
-              />
-            </div>
-          </div>
 
           {Math.max(0, formData.quantity - formData.available_stock) === 0 && formData.quantity > 0 && (
             <div style={{

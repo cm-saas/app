@@ -43,6 +43,7 @@ function App() {
                 <Route path="orders" element={<Orders />} />
                 <Route path="capacity" element={<Capacity />} />
                 <Route path="parts" element={<Parts />} />
+                <Route path="production" element={<Production />} />
                 <Route path="risks" element={<Risks />} />
               </Route>
               

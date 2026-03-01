@@ -36,6 +36,10 @@ export default function AppLayout() {
             <Calendar size={20} />
             <span>Orders</span>
           </Link>
+          <Link to="/app/parts" className={`nav-link ${location.pathname === '/app/parts' ? 'active' : ''}`}>
+            <Package size={20} />
+            <span>Parts</span>
+          </Link>
           <Link to="/app/capacity" className={`nav-link ${location.pathname === '/app/capacity' ? 'active' : ''}`}>
             <TrendingUp size={20} />
             <span>Capacity</span>

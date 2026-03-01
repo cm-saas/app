@@ -133,14 +133,26 @@ async def update_production_log(log_id: str, log_data: ProductionLogUpdate, curr
     if not log:
         raise HTTPException(status_code=404, detail="Production log not found")
     
-    # If updating quantity, validate against remaining quantity
-    if log_data.quantity_produced is not None:
+    # If updating quantity, validate against remaining quantity and rejection rules
+    if log_data.quantity_produced is not None or log_data.quantity_rejected is not None:
         # Get order
         order = await orders_collection.find_one({"id": log["order_id"], "user_id": user_id})
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
         
-        # Calculate actual_units_completed (excluding this log)
+        # Get new values (use existing if not updating)
+        new_produced = log_data.quantity_produced if log_data.quantity_produced is not None else log.get("quantity_produced", 0)
+        new_rejected = log_data.quantity_rejected if log_data.quantity_rejected is not None else log.get("quantity_rejected", 0)
+        
+        # Validate rejection rules
+        if new_rejected < 0:
+            raise HTTPException(status_code=400, detail="Quantity rejected cannot be negative")
+        if new_rejected > new_produced:
+            raise HTTPException(status_code=400, detail="Quantity rejected cannot exceed quantity produced")
+        if new_rejected > 0 and new_produced == 0:
+            raise HTTPException(status_code=400, detail="Cannot have rejections without production")
+        
+        # Calculate net_good (excluding this log)
         existing_logs = []
         async for existing_log in production_logs_collection.find({
             "user_id": user_id, 
@@ -149,15 +161,19 @@ async def update_production_log(log_id: str, log_data: ProductionLogUpdate, curr
         }):
             existing_logs.append(existing_log)
         
-        actual_units_completed = sum(l.get("quantity_produced", 0) for l in existing_logs)
-        net_required_quantity = order.get("net_required_quantity", order.get("quantity", 0))
-        remaining_quantity = net_required_quantity - actual_units_completed
+        total_produced = sum(l.get("quantity_produced", 0) for l in existing_logs)
+        total_rejected = sum(l.get("quantity_rejected", 0) for l in existing_logs)
+        net_good = total_produced - total_rejected
         
-        # Check if new quantity would exceed remaining
-        if log_data.quantity_produced > remaining_quantity:
+        net_required_quantity = order.get("net_required_quantity", order.get("quantity", 0))
+        
+        # Check if new quantity would exceed remaining (based on net_good)
+        new_net_good = net_good + (new_produced - new_rejected)
+        if new_net_good > net_required_quantity:
+            remaining = net_required_quantity - net_good
             raise HTTPException(
                 status_code=400, 
-                detail=f"Cannot exceed remaining quantity. Remaining: {remaining_quantity}"
+                detail=f"Cannot exceed remaining quantity. Remaining: {remaining}"
             )
     
     # Check if updating date would create duplicate

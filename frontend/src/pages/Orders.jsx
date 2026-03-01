@@ -341,19 +341,53 @@ function CreateOrderModal({ workCenters, parts, onClose, onSave }) {
 
           <div className="form-group">
             <label className="form-label">Part Number</label>
-            <select
-              value={formData.part_number}
+            <Select
+              value={parts.map(p => ({ value: p.part_number, label: `${p.part_number} - ${p.description}` })).find(opt => opt.value === formData.part_number)}
               onChange={handlePartSelect}
-              className="form-input-modal"
+              options={parts.map(p => ({ value: p.part_number, label: `${p.part_number} - ${p.description}` }))}
+              placeholder="Select a part..."
+              isClearable
+              isSearchable
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  background: 'var(--bg-elevated)',
+                  borderColor: 'var(--border-default)',
+                  minHeight: '40px',
+                  '&:hover': {
+                    borderColor: 'var(--border-hover)'
+                  }
+                }),
+                menu: (base) => ({
+                  ...base,
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-default)',
+                  zIndex: 9999
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  background: state.isFocused ? 'var(--bg-hover)' : 'var(--bg-elevated)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    background: 'var(--bg-hover)'
+                  }
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  color: 'var(--text-primary)'
+                }),
+                input: (base) => ({
+                  ...base,
+                  color: 'var(--text-primary)'
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  color: 'var(--text-muted)'
+                })
+              }}
               required
-            >
-              <option value="">Select a part...</option>
-              {parts.map(part => (
-                <option key={part.id} value={part.part_number}>
-                  {part.part_number} - {part.description}
-                </option>
-              ))}
-            </select>
+            />
             {parts.length === 0 && (
               <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
                 No parts available. Create parts first in the Parts tab.

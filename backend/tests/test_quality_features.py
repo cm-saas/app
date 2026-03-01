@@ -18,15 +18,25 @@ class TestSetup:
         email = f"test_quality_{int(time.time())}@test.com"
         password = "TestPass123!"
         
-        response = session.post(f"{BASE_URL}/api/auth/register", json={
+        # Register user
+        reg_response = session.post(f"{BASE_URL}/api/auth/register", json={
             "email": email,
             "password": password,
             "full_name": "Quality Test User"
         })
         
         # Accept both 200 and 201 as success
-        if response.status_code in [200, 201]:
-            data = response.json()
+        if reg_response.status_code not in [200, 201]:
+            return None, email, password
+        
+        # Login to get token
+        login_response = session.post(f"{BASE_URL}/api/auth/login", json={
+            "email": email,
+            "password": password
+        })
+        
+        if login_response.status_code == 200:
+            data = login_response.json()
             return data.get("access_token"), email, password
         
         return None, email, password
@@ -280,7 +290,8 @@ class TestAuthEndpoints:
         # Accept both 200 and 201 as success
         assert response.status_code in [200, 201], f"Registration failed: {response.status_code}"
         data = response.json()
-        assert "access_token" in data
+        assert "email" in data
+        assert data["email"] == email
         print(f"SUCCESS: User registered - {email}")
     
     def test_login_endpoint(self):

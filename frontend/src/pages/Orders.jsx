@@ -201,11 +201,15 @@ export default function Orders() {
 }
 
 function CreateOrderModal({ workCenters, onClose, onSave }) {
+  const today = new Date().toISOString().split('T')[0];
+  
   const [formData, setFormData] = useState({
     customer: '',
+    part_number: '',
     quantity: 100,
     available_stock: 0,
     priority: 2,
+    start_date: today,
     due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days from now
     routing: [
       {
@@ -226,12 +230,15 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
     // Create new order with stock calculations
     const newOrder = {
       customer: formData.customer,
+      part_number: formData.part_number,
       original_quantity: formData.quantity,
       available_stock: formData.available_stock,
       net_required_quantity: netRequired,
       quantity: netRequired, // This is what scheduling engine uses
       priority: formData.priority,
+      start_date: formData.start_date,
       due_date: new Date(formData.due_date).toISOString(),
+      actual_units_completed: 0,
       status: netRequired === 0 ? 'COMPLETED' : 'PLANNED',
       routing: formData.routing.map(step => ({
         ...step,

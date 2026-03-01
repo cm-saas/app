@@ -647,19 +647,6 @@ function EditOrderModal({ order, workCenters, onClose, onSave }) {
                 required
               />
             </div>
-
-            <div className="form-group">
-              <label className="form-label">Status</label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="form-input-modal"
-              >
-                <option value="PLANNED">Planned</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
-            </div>
           </div>
 
           {/* Routing Steps */}

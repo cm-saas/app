@@ -35,10 +35,13 @@ async def create_part(part_data: PartCreate, current_user: dict = Depends(get_cu
     """Create a new part"""
     user_id = current_user["user_id"]
     
-    # Check if part_number already exists for this user
+    # Normalize part_number: trim whitespace and convert to uppercase
+    normalized_part_number = part_data.part_number.strip().upper()
+    
+    # Check if part_number already exists for this user (case-insensitive)
     existing_part = await parts_collection.find_one({
         "user_id": user_id,
-        "part_number": part_data.part_number
+        "part_number": normalized_part_number
     })
     
     if existing_part:
@@ -48,11 +51,11 @@ async def create_part(part_data: PartCreate, current_user: dict = Depends(get_cu
     if not part_data.default_routing or len(part_data.default_routing) == 0:
         raise HTTPException(status_code=400, detail="Part must have at least one routing step")
     
-    # Create new part
+    # Create new part with normalized part_number
     new_part = {
         "id": f"part_{uuid.uuid4().hex[:12]}",
         "user_id": user_id,
-        "part_number": part_data.part_number,
+        "part_number": normalized_part_number,
         "description": part_data.description,
         "default_routing": [step.dict() for step in part_data.default_routing],
         "created_at": datetime.utcnow().isoformat(),

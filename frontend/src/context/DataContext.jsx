@@ -344,9 +344,44 @@ export const DataProvider = ({ children }) => {
     await triggerRebuild(updatedWCs, orders, true);
   };
 
+  // Parts CRUD operations
+  const addPart = async (partData) => {
+    try {
+      const response = await axios.post(`${backendUrl}/api/data/parts`, partData);
+      setParts([...parts, response.data]);
+      toast.success('Part added successfully');
+    } catch (error) {
+      console.error('Failed to add part:', error);
+      toast.error(error.response?.data?.detail || 'Failed to add part');
+    }
+  };
+
+  const updatePart = async (partId, updates) => {
+    try {
+      const response = await axios.put(`${backendUrl}/api/data/parts/${partId}`, updates);
+      setParts(parts.map(p => p.id === partId ? response.data : p));
+      toast.success('Part updated successfully');
+    } catch (error) {
+      console.error('Failed to update part:', error);
+      toast.error(error.response?.data?.detail || 'Failed to update part');
+    }
+  };
+
+  const deletePart = async (partId) => {
+    try {
+      await axios.delete(`${backendUrl}/api/data/parts/${partId}`);
+      setParts(parts.filter(p => p.id !== partId));
+      toast.success('Part deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete part:', error);
+      toast.error('Failed to delete part');
+    }
+  };
+
   const value = {
     workCenters,
     orders,
+    parts,
     loading,
     rebuilding,
     addOrder,
@@ -358,7 +393,10 @@ export const DataProvider = ({ children }) => {
     updateOvertime,
     addBreakdown,
     removeBreakdown,
-    triggerRebuild
+    triggerRebuild,
+    addPart,
+    updatePart,
+    deletePart
   };
 
   return (

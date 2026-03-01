@@ -748,6 +748,38 @@ function EditOrderModal({ order, workCenters, parts, onClose, onSave }) {
             <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
               Changing part number will NOT overwrite your existing routing
             </small>
+            
+            {/* Show "Load routing" button when part has changed */}
+            {canLoadRoutingFromPartMaster && (
+              <button
+                type="button"
+                onClick={handleLoadRoutingFromPartMaster}
+                style={{
+                  marginTop: '8px',
+                  padding: '6px 12px',
+                  fontSize: '13px',
+                  background: 'var(--brand-primary)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'opacity 0.2s',
+                  opacity: 0.9
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = '1'}
+                onMouseLeave={(e) => e.target.style.opacity = '0.9'}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Load routing from Part Master
+              </button>
+            )}
           </div>
 
           <div className="form-row">

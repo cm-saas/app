@@ -194,6 +194,8 @@ async def update_production_log(log_id: str, log_data: ProductionLogUpdate, curr
         update_dict["date"] = log_data.date
     if log_data.quantity_produced is not None:
         update_dict["quantity_produced"] = log_data.quantity_produced
+    if log_data.quantity_rejected is not None:
+        update_dict["quantity_rejected"] = log_data.quantity_rejected
     
     # Update the log
     await production_logs_collection.update_one(

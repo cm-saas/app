@@ -229,8 +229,8 @@ function CreateOrderModal({ workCenters, parts, onClose, onSave }) {
   });
 
   // Handle part selection - auto-fill routing from Part Master
-  const handlePartSelect = (e) => {
-    const selectedPartNumber = e.target.value;
+  const handlePartSelect = (selectedOption) => {
+    const selectedPartNumber = selectedOption ? selectedOption.value : '';
     setFormData({ ...formData, part_number: selectedPartNumber });
     
     if (selectedPartNumber) {

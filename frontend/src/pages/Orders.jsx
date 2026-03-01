@@ -313,16 +313,29 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
             />
           </div>
 
+          <div className="form-group">
+            <label className="form-label">Part Number</label>
+            <input
+              type="text"
+              value={formData.part_number}
+              onChange={(e) => setFormData({ ...formData, part_number: e.target.value })}
+              className="form-input-modal"
+              placeholder="Part number"
+              required
+            />
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Quantity Required</label>
               <input
                 type="number"
                 value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, quantity: Math.max(1, parseInt(e.target.value, 10) || 1) })}
                 className="form-input-modal"
                 required
                 min="1"
+                step="1"
               />
             </div>
 
@@ -331,13 +344,64 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
               <input
                 type="number"
                 value={formData.available_stock}
-                onChange={(e) => setFormData({ ...formData, available_stock: parseInt(e.target.value) || 0 })}
+                onChange={(e) => {
+                  const value = Math.max(0, parseInt(e.target.value, 10) || 0);
+                  setFormData({ ...formData, available_stock: value });
+                }}
                 className="form-input-modal"
                 min="0"
+                step="1"
               />
             </div>
 
             <div className="form-group">
+              <label className="form-label">Net To Produce</label>
+              <input
+                type="number"
+                value={Math.max(0, formData.quantity - formData.available_stock)}
+                className="form-input-modal"
+                disabled
+                style={{ background: 'var(--bg-elevated)', color: 'var(--brand-primary)', fontWeight: '600' }}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Start Date</label>
+              <input
+                type="date"
+                value={formData.start_date}
+                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                className="form-input-modal"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Due Date</label>
+              <input
+                type="date"
+                value={formData.due_date}
+                onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
+                className="form-input-modal"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Priority</label>
+              <select
+                value={formData.priority}
+                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value, 10) })}
+                className="form-input-modal"
+              >
+                <option value={3}>High (3)</option>
+                <option value={2}>Normal (2)</option>
+                <option value={1}>Low (1)</option>
+              </select>
+            </div>
+          </div>
               <label className="form-label">Net To Produce</label>
               <input
                 type="number"

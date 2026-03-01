@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -10,6 +11,8 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 
+# Import manufacturing routers
+from routers import orders, work_centers, dashboard, auth, data
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -20,7 +23,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(title="FluxNex API", version="1.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -40,7 +43,7 @@ class StatusCheckCreate(BaseModel):
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "FluxNex API v1.0 - Manufacturing Intelligence Platform"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
@@ -66,8 +69,19 @@ async def get_status_checks():
     
     return status_checks
 
-# Include the router in the main app
+# Include the main API router
 app.include_router(api_router)
+
+# Include authentication router
+app.include_router(auth.router)
+
+# Include protected data router
+app.include_router(data.router)
+
+# Include manufacturing routers (legacy - will be deprecated)
+app.include_router(orders.router)
+app.include_router(work_centers.router)
+app.include_router(dashboard.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -87,3 +101,21 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+# ==================== SPA CATCH-ALL ====================
+# IMPORTANT: This MUST be the last route defined
+# Serves index.html for all non-API routes to enable client-side routing
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """
+    Catch-all route for SPA (Single Page Application).
+    Returns index.html for all routes not matched by API endpoints.
+    This allows React Router to handle client-side routing.
+    """
+    # Don't serve index.html for API routes (safety check)
+    if full_path.startswith("api/"):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    
+    # Serve index.html for all other routes
+    return FileResponse("/app/frontend/build/index.html")

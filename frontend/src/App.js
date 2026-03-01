@@ -1,53 +1,58 @@
-import { useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import "./dashboard.css";
+import "./enterprise.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { DataProvider } from "./context/DataContext";
+import { ToastProvider } from "./components/ToastProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AppLayout from "./components/AppLayout";
+import Home from "./pages/Home";
+import Signup from "./pages/Signup";
+import DemoRequest from "./pages/DemoRequest";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import DashboardEnterprise from "./pages/DashboardEnterprise";
+import Orders from "./pages/Orders";
+import Capacity from "./pages/Capacity";
+import Risks from "./pages/Risks";
 
 function App() {
   return (
-    <div className="App">
+    <ToastProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <DataProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/demo" element={<DemoRequest />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* Protected Routes - Nested under /app */}
+              <Route path="/app/*" element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<DashboardEnterprise />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="capacity" element={<Capacity />} />
+                <Route path="risks" element={<Risks />} />
+              </Route>
+              
+              {/* Legacy redirect - /dashboard → /app */}
+              <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+              
+              {/* Catch all - redirect to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </DataProvider>
+        </AuthProvider>
       </BrowserRouter>
-    </div>
+    </ToastProvider>
   );
 }
 

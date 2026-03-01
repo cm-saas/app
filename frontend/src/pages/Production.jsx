@@ -7,7 +7,8 @@ export default function Production() {
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [formData, setFormData] = useState({
     date: getYesterday(),
-    quantity_produced: 0
+    quantity_produced: 0,
+    quantity_rejected: 0
   });
   const [editingLog, setEditingLog] = useState(null);
 

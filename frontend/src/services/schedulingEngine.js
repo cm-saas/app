@@ -294,6 +294,18 @@ export const rebuildSchedule = (workCenters, orders) => {
   // Step 4: Flow-based scheduling
   scheduleFlowBased(workCenters, sortedOrders, lastDateStr);
   
+  // DEBUG: Print values for 15000 order after scheduleFlowBased() completes
+  sortedOrders.forEach(order => {
+    if (order.quantity === 15000) {
+      console.log('\n[AFTER scheduleFlowBased()] 15000 Order:');
+      order.routing.forEach(step => {
+        console.log(`  Step ${step.sequence_number}:`);
+        console.log(`    total_units_completed: ${step.total_units_completed}`);
+        console.log(`    completion_date: ${step.completion_date}`);
+      });
+    }
+  });
+  
   // Step 5: Calculate completion dates and delays
   sortedOrders.forEach(order => {
     if (!order.unscheduled) {

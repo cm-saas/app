@@ -113,6 +113,7 @@ async def create_production_log(log_data: ProductionLogCreate, current_user: dic
         "part_number": log_data.part_number,
         "date": log_data.date,
         "quantity_produced": log_data.quantity_produced,
+        "quantity_rejected": log_data.quantity_rejected,
         "created_at": datetime.utcnow().isoformat(),
         "updated_at": datetime.utcnow().isoformat()
     }

@@ -54,17 +54,21 @@ export const DataProvider = ({ children }) => {
       return;
     }
 
-    console.log('[DataContext] Fetching work centers and orders...');
+    console.log('[DataContext] Fetching work centers, orders, and parts...');
     try {
-      const [wcsResponse, ordersResponse] = await Promise.all([
+      const [wcsResponse, ordersResponse, partsResponse] = await Promise.all([
         axios.get(`${backendUrl}/api/data/work-centers`),
-        axios.get(`${backendUrl}/api/data/orders`)
+        axios.get(`${backendUrl}/api/data/orders`),
+        axios.get(`${backendUrl}/api/data/parts`)
       ]);
 
       const wcs = wcsResponse.data || [];
       const ords = ordersResponse.data || [];
+      const partsList = partsResponse.data || [];
 
-      console.log('[DataContext] Fetched:', wcs.length, 'work centers,', ords.length, 'orders');
+      console.log('[DataContext] Fetched:', wcs.length, 'work centers,', ords.length, 'orders,', partsList.length, 'parts');
+
+      setParts(partsList);
 
       // Trigger local rebuild for scheduling
       await triggerRebuild(wcs, ords, false, true);

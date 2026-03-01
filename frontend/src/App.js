@@ -17,6 +17,7 @@ import Orders from "./pages/Orders";
 import Capacity from "./pages/Capacity";
 import Risks from "./pages/Risks";
 import Parts from "./pages/Parts";
+import Production from "./pages/Production";
 
 function App() {
   return (

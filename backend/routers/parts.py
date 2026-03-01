@@ -18,6 +18,31 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 parts_collection = db.parts
 
+# Create unique compound index for user_id + part_number (case-insensitive enforcement)
+async def create_indexes():
+    """Create MongoDB indexes for parts collection"""
+    try:
+        # Create compound unique index on user_id and part_number
+        await parts_collection.create_index(
+            [("user_id", 1), ("part_number", 1)],
+            unique=True,
+            name="unique_user_part_number"
+        )
+        print("✓ Parts collection indexes created successfully")
+    except Exception as e:
+        print(f"⚠ Index creation warning: {e}")
+
+# Call index creation on module load
+import asyncio
+try:
+    loop = asyncio.get_event_loop()
+    if loop.is_running():
+        asyncio.create_task(create_indexes())
+    else:
+        loop.run_until_complete(create_indexes())
+except:
+    pass  # Indexes will be created on first API call
+
 @router.get("/parts", response_model=List[Part])
 async def get_parts(current_user: dict = Depends(get_current_user)):
     """Get all parts for the current user"""

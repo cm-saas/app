@@ -177,6 +177,17 @@ export default function Orders() {
           }}
         />
       )}
+
+      {creatingOrder && (
+        <CreateOrderModal 
+          workCenters={workCenters}
+          onClose={() => setCreatingOrder(false)}
+          onSave={(newOrder) => {
+            addOrder(newOrder);
+            setCreatingOrder(false);
+          }}
+        />
+      )}
     </div>
   );
 }

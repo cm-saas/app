@@ -202,13 +202,6 @@ const scheduleFlowBased = (workCenters, orders, lastDateStr) => {
         // Units to process = min(WIP available, capacity-based limit)
         const unitsToProcess = Math.min(wipAvailable, Math.max(0, maxUnitsByCapacity));
         
-        // DEBUG: Log for 15000 order, first routing step, first 5 days
-        if (order.quantity === 15000 && routingStep.sequence_number === 1 && dayIndex < 5) {
-          console.log(`[DEBUG 15000 ORDER] Day ${dayIndex + 1} (${currentDateStr}):`);
-          console.log(`  wipAvailable: ${wipAvailable}`);
-          console.log(`  unitsToProcess: ${unitsToProcess}`);
-        }
-        
         // Calculate actual hours required (setup once + cycle time per unit)
         const hoursRequired = setupTime + (unitsToProcess * routingStep.cycle_time_minutes / 60);
         

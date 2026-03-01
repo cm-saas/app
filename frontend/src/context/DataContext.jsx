@@ -399,10 +399,57 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  // Production CRUD operations
+  const addProductionLog = async (logData) => {
+    try {
+      const response = await axios.post(`${backendUrl}/api/data/production`, logData);
+      setProductionLogs([...productionLogs, response.data]);
+      
+      // Recalculate order metrics after adding production
+      await fetchData();
+      
+      toast.success('Production logged successfully');
+    } catch (error) {
+      console.error('Failed to add production log:', error);
+      toast.error(error.response?.data?.detail || 'Failed to log production');
+    }
+  };
+
+  const updateProductionLog = async (logId, updates) => {
+    try {
+      const response = await axios.put(`${backendUrl}/api/data/production/${logId}`, updates);
+      setProductionLogs(productionLogs.map(l => l.id === logId ? response.data : l));
+      
+      // Recalculate order metrics after updating production
+      await fetchData();
+      
+      toast.success('Production log updated successfully');
+    } catch (error) {
+      console.error('Failed to update production log:', error);
+      toast.error(error.response?.data?.detail || 'Failed to update production log');
+    }
+  };
+
+  const deleteProductionLog = async (logId) => {
+    try {
+      await axios.delete(`${backendUrl}/api/data/production/${logId}`);
+      setProductionLogs(productionLogs.filter(l => l.id !== logId));
+      
+      // Recalculate order metrics after deleting production
+      await fetchData();
+      
+      toast.success('Production log deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete production log:', error);
+      toast.error('Failed to delete production log');
+    }
+  };
+
   const value = {
     workCenters,
     orders,
     parts,
+    productionLogs,
     loading,
     rebuilding,
     addOrder,
@@ -417,7 +464,10 @@ export const DataProvider = ({ children }) => {
     triggerRebuild,
     addPart,
     updatePart,
-    deletePart
+    deletePart,
+    addProductionLog,
+    updateProductionLog,
+    deleteProductionLog
   };
 
   return (

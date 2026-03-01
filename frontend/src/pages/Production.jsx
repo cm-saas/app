@@ -238,6 +238,7 @@ export default function Production() {
                     min="0"
                     step="any"
                     placeholder="Optional"
+                    data-testid="production-quantity-rejected-input"
                   />
                   <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
                     Units that failed quality inspection

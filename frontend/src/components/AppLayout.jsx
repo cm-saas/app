@@ -44,7 +44,7 @@ export default function AppLayout() {
             <ClipboardList size={20} />
             <span>Production</span>
           </Link>
-          <Link to="/app/quality" className={`nav-link ${location.pathname === '/app/quality' ? 'active' : ''}`}>
+          <Link to="/app/quality" className={`nav-link ${location.pathname === '/app/quality' ? 'active' : ''}`} data-testid="nav-quality-link">
             <ShieldCheck size={20} />
             <span>Quality</span>
           </Link>

@@ -283,7 +283,8 @@ export default function Production() {
                     <th>Date</th>
                     <th>Customer</th>
                     <th>Part Number</th>
-                    <th>Quantity</th>
+                    <th>Produced</th>
+                    <th>Rejected</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -297,6 +298,9 @@ export default function Production() {
                         <td className="mono-text">{log.part_number}</td>
                         <td style={{ fontWeight: '600', color: 'var(--brand-primary)' }}>
                           {log.quantity_produced}
+                        </td>
+                        <td style={{ fontWeight: '600', color: log.quantity_rejected > 0 ? '#FF5252' : 'var(--text-muted)' }}>
+                          {log.quantity_rejected || 0}
                         </td>
                         <td>
                           <div className="action-buttons" style={{ display: 'flex', gap: '8px' }}>

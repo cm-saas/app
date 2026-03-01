@@ -33,18 +33,21 @@ export const DataProvider = ({ children }) => {
   // Calculate automatic order status based on conditions
   const calculateOrderStatus = (order) => {
     const today = new Date().toISOString().split("T")[0];
+    
+    // remaining_quantity is derived: net_required_quantity - actual_units_completed
+    const remaining = order.remaining_quantity !== undefined 
+      ? order.remaining_quantity 
+      : (order.net_required_quantity || order.quantity) - (order.actual_units_completed || 0);
 
     if (order.unscheduled) return "UNSCHEDULED";
 
-    if (order.net_required_quantity === 0) return "COMPLETED";
+    if (remaining <= 0) return "COMPLETED";
 
-    if (order.actual_units_completed >= order.original_quantity) return "COMPLETED";
+    if (order.actual_units_completed > 0) return "IN_PROGRESS";
 
     if (today < order.start_date) return "PLANNED";
 
-    if (today >= order.start_date) return "IN_PROGRESS";
-
-    return "PLANNED";
+    return "IN_PROGRESS";
   };
 
   // Fetch data from API

@@ -205,7 +205,7 @@ export default function Orders() {
   );
 }
 
-function CreateOrderModal({ workCenters, onClose, onSave }) {
+function CreateOrderModal({ workCenters, parts, onClose, onSave }) {
   const today = new Date().toISOString().split('T')[0];
   
   const [formData, setFormData] = useState({
@@ -225,6 +225,25 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
       }
     ]
   });
+
+  // Handle part selection - auto-fill routing from Part Master
+  const handlePartSelect = (e) => {
+    const selectedPartNumber = e.target.value;
+    setFormData({ ...formData, part_number: selectedPartNumber });
+    
+    if (selectedPartNumber) {
+      const selectedPart = parts.find(p => p.part_number === selectedPartNumber);
+      if (selectedPart && selectedPart.default_routing) {
+        // Deep copy routing from part master
+        const copiedRouting = JSON.parse(JSON.stringify(selectedPart.default_routing));
+        setFormData({
+          ...formData,
+          part_number: selectedPartNumber,
+          routing: copiedRouting
+        });
+      }
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

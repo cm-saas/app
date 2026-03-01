@@ -232,6 +232,11 @@ const scheduleFlowBased = (workCenters, orders, lastDateStr) => {
           // Update completion tracking
           routingStep.total_units_completed += unitsToProcess;
           
+          // DEBUG: Log total_units_completed for 15000 order, first routing step, first 5 days
+          if (order.quantity === 15000 && routingStep.sequence_number === 1 && dayIndex < 5) {
+            console.log(`  total_units_completed (after): ${routingStep.total_units_completed}`);
+          }
+          
           // Mark step completion date when all units done
           if (routingStep.total_units_completed >= order.quantity) {
             routingStep.completion_date = currentDateStr;

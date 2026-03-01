@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Calendar, TrendingUp, AlertTriangle, LogOut, User, Package, ClipboardList } from 'lucide-react';
+import { Activity, Calendar, TrendingUp, AlertTriangle, LogOut, User, Package, ClipboardList, ShieldCheck } from 'lucide-react';
 import '../enterprise.css';
 
 export default function AppLayout() {
@@ -43,6 +43,10 @@ export default function AppLayout() {
           <Link to="/app/production" className={`nav-link ${location.pathname === '/app/production' ? 'active' : ''}`}>
             <ClipboardList size={20} />
             <span>Production</span>
+          </Link>
+          <Link to="/app/quality" className={`nav-link ${location.pathname === '/app/quality' ? 'active' : ''}`}>
+            <ShieldCheck size={20} />
+            <span>Quality</span>
           </Link>
           <Link to="/app/capacity" className={`nav-link ${location.pathname === '/app/capacity' ? 'active' : ''}`}>
             <TrendingUp size={20} />

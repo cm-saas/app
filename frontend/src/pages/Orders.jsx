@@ -63,7 +63,7 @@ export default function Orders() {
               <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
-                <th>Quantity</th>
+                <th>Qty (Orig/Stock/Net)</th>
                 <th>Priority</th>
                 <th>Due Date</th>
                 <th>Completion</th>
@@ -76,11 +76,27 @@ export default function Orders() {
             <tbody>
               {orders.map(order => {
                 const risk = calculateDeliveryRisk(order);
+                const origQty = order.original_quantity || order.quantity;
+                const stock = order.available_stock || 0;
+                const netQty = order.net_required_quantity !== undefined ? order.net_required_quantity : order.quantity;
+                
                 return (
                   <tr key={order.id}>
                     <td className="mono-text">{order.id.substring(0, 12)}...</td>
                     <td>{order.customer}</td>
-                    <td>{order.quantity}</td>
+                    <td>
+                      <div style={{ fontSize: '13px' }}>
+                        <span style={{ color: 'var(--text-primary)' }}>{origQty}</span>
+                        {stock > 0 && (
+                          <>
+                            <span style={{ color: 'var(--text-tertiary)' }}> / </span>
+                            <span style={{ color: '#00C853' }}>{stock}</span>
+                            <span style={{ color: 'var(--text-tertiary)' }}> / </span>
+                            <span style={{ color: 'var(--brand-primary)', fontWeight: '600' }}>{netQty}</span>
+                          </>
+                        )}
+                      </div>
+                    </td>
                     <td>
                       <span className={`badge ${order.priority === 3 ? 'badge-danger' : order.priority === 2 ? 'badge-warning' : 'badge-info'}`}>
                         {getPriorityLabel(order.priority)}

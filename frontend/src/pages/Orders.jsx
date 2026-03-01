@@ -188,6 +188,7 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
   const [formData, setFormData] = useState({
     customer: '',
     quantity: 100,
+    available_stock: 0,
     priority: 2,
     due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 14 days from now
     routing: [
@@ -203,20 +204,35 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Create new order
+    // Calculate net required quantity
+    const netRequired = Math.max(0, formData.quantity - formData.available_stock);
+    
+    // Create new order with stock calculations
     const newOrder = {
-      ...formData,
+      customer: formData.customer,
+      original_quantity: formData.quantity,
+      available_stock: formData.available_stock,
+      net_required_quantity: netRequired,
+      quantity: netRequired, // This is what scheduling engine uses
+      priority: formData.priority,
       due_date: new Date(formData.due_date).toISOString(),
-      status: 'PLANNED',
+      status: netRequired === 0 ? 'COMPLETED' : 'PLANNED',
       routing: formData.routing.map(step => ({
         ...step,
-        completion_date: null,
+        completion_date: netRequired === 0 ? new Date().toISOString().split('T')[0] : null,
         scheduled_days: [],
-        total_units_completed: 0,
+        total_units_completed: netRequired === 0 ? netRequired : 0,
         units_in_progress: 0,
         required_hours: 0
       }))
     };
+    
+    // If net required is 0, mark as completed immediately
+    if (netRequired === 0) {
+      newOrder.planned_completion_date = new Date().toISOString().split('T')[0];
+      newOrder.delayed = false;
+      newOrder.delay_days = 0;
+    }
     
     onSave(newOrder);
   };

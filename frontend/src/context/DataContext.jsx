@@ -23,6 +23,7 @@ export const DataProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const [workCenters, setWorkCenters] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
 

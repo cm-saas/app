@@ -585,6 +585,8 @@ function CreateOrderModal({ workCenters, parts, onClose, onSave }) {
 }
 
 function EditOrderModal({ order, workCenters, parts, onClose, onSave }) {
+  const originalPartNumber = order.part_number || '';
+  
   const [formData, setFormData] = useState({
     customer: order.customer,
     part_number: order.part_number || '',
@@ -610,6 +612,11 @@ function EditOrderModal({ order, workCenters, parts, onClose, onSave }) {
     });
   }
 
+  // Detect if part has changed from original
+  const hasPartChanged = formData.part_number !== originalPartNumber;
+  const selectedPart = parts.find(p => p.part_number === formData.part_number);
+  const canLoadRoutingFromPartMaster = hasPartChanged && selectedPart && selectedPart.default_routing && selectedPart.default_routing.length > 0;
+
   // Handle part selection - DO NOT auto-overwrite routing when editing
   const handlePartSelect = (selectedOption) => {
     setFormData({ 
@@ -618,6 +625,18 @@ function EditOrderModal({ order, workCenters, parts, onClose, onSave }) {
     });
     // Note: Unlike CreateOrderModal, we do NOT auto-fill routing here
     // User's existing routing is preserved when editing
+  };
+
+  // Load routing from Part Master (deep copy to avoid mutation)
+  const handleLoadRoutingFromPartMaster = () => {
+    if (selectedPart && selectedPart.default_routing) {
+      // Deep copy to avoid mutating the original part master
+      const copiedRouting = JSON.parse(JSON.stringify(selectedPart.default_routing));
+      setFormData({
+        ...formData,
+        routing: copiedRouting
+      });
+    }
   };
 
   const handleSubmit = (e) => {

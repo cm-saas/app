@@ -316,8 +316,17 @@ export const rebuildSchedule = (workCenters, orders) => {
     }
     
     if (!order.unscheduled) {
-      const lastStep = order.routing[order.routing.length - 1];
-      order.planned_completion_date = lastStep.completion_date;
+      // Find the routing step with the highest sequence_number that completed all units
+      let completedStep = null;
+      for (const step of order.routing) {
+        if (step.total_units_completed >= order.quantity && step.completion_date !== null) {
+          if (!completedStep || step.sequence_number > completedStep.sequence_number) {
+            completedStep = step;
+          }
+        }
+      }
+      
+      order.planned_completion_date = completedStep ? completedStep.completion_date : null;
       
       if (order.planned_completion_date) {
         const dueDate = new Date(order.due_date);

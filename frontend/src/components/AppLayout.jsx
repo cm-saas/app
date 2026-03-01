@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Calendar, TrendingUp, AlertTriangle, LogOut, User, Package } from 'lucide-react';
+import { Activity, Calendar, TrendingUp, AlertTriangle, LogOut, User, Package, ClipboardList } from 'lucide-react';
 import '../enterprise.css';
 
 export default function AppLayout() {

@@ -339,14 +339,24 @@ function CreateOrderModal({ workCenters, parts, onClose, onSave }) {
 
           <div className="form-group">
             <label className="form-label">Part Number</label>
-            <input
-              type="text"
+            <select
               value={formData.part_number}
-              onChange={(e) => setFormData({ ...formData, part_number: e.target.value })}
+              onChange={handlePartSelect}
               className="form-input-modal"
-              placeholder="Part number"
               required
-            />
+            >
+              <option value="">Select a part...</option>
+              {parts.map(part => (
+                <option key={part.id} value={part.part_number}>
+                  {part.part_number} - {part.description}
+                </option>
+              ))}
+            </select>
+            {parts.length === 0 && (
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                No parts available. Create parts first in the Parts tab.
+              </p>
+            )}
           </div>
 
           <div className="form-row">

@@ -40,6 +40,10 @@ export default function AppLayout() {
             <Package size={20} />
             <span>Parts</span>
           </Link>
+          <Link to="/app/production" className={`nav-link ${location.pathname === '/app/production' ? 'active' : ''}`}>
+            <ClipboardList size={20} />
+            <span>Production</span>
+          </Link>
           <Link to="/app/capacity" className={`nav-link ${location.pathname === '/app/capacity' ? 'active' : ''}`}>
             <TrendingUp size={20} />
             <span>Capacity</span>

@@ -292,17 +292,41 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Quantity</label>
+              <label className="form-label">Quantity Required</label>
               <input
                 type="number"
                 value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
                 className="form-input-modal"
                 required
                 min="1"
               />
             </div>
 
+            <div className="form-group">
+              <label className="form-label">Available Stock</label>
+              <input
+                type="number"
+                value={formData.available_stock}
+                onChange={(e) => setFormData({ ...formData, available_stock: parseInt(e.target.value) || 0 })}
+                className="form-input-modal"
+                min="0"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Net To Produce</label>
+              <input
+                type="number"
+                value={Math.max(0, formData.quantity - formData.available_stock)}
+                className="form-input-modal"
+                disabled
+                style={{ background: 'var(--bg-elevated)', color: 'var(--brand-primary)', fontWeight: '600' }}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-group">
               <label className="form-label">Priority</label>
               <select
@@ -327,6 +351,20 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
               />
             </div>
           </div>
+
+          {Math.max(0, formData.quantity - formData.available_stock) === 0 && formData.quantity > 0 && (
+            <div style={{
+              background: 'rgba(0, 200, 83, 0.1)',
+              border: '1px solid rgba(0, 200, 83, 0.3)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 16px',
+              fontSize: '13px',
+              color: '#00C853',
+              marginBottom: '16px'
+            }}>
+              ✓ This order will be marked as COMPLETED (fulfilled from available stock)
+            </div>
+          )}
 
           {/* Routing Steps */}
           <div style={{ marginTop: '24px', marginBottom: '24px' }}>

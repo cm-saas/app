@@ -9,6 +9,7 @@ class ProductionLog(BaseModel):
     part_number: str
     date: str  # YYYY-MM-DD format
     quantity_produced: float
+    quantity_rejected: float = 0.0
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -17,11 +18,27 @@ class ProductionLogCreate(BaseModel):
     part_number: str
     date: str  # YYYY-MM-DD format
     quantity_produced: float
+    quantity_rejected: float = 0.0
     
     @validator('quantity_produced')
-    def validate_quantity(cls, v):
+    def validate_quantity_produced(cls, v):
         if v < 0:
             raise ValueError('Quantity produced cannot be negative')
+        return v
+    
+    @validator('quantity_rejected')
+    def validate_quantity_rejected(cls, v, values):
+        if v < 0:
+            raise ValueError('Quantity rejected cannot be negative')
+        
+        quantity_produced = values.get('quantity_produced', 0)
+        
+        if v > quantity_produced:
+            raise ValueError('Quantity rejected cannot exceed quantity produced')
+        
+        if v > 0 and quantity_produced == 0:
+            raise ValueError('Cannot have rejections without production')
+        
         return v
     
     @validator('date')
@@ -40,11 +57,23 @@ class ProductionLogCreate(BaseModel):
 class ProductionLogUpdate(BaseModel):
     date: Optional[str] = None
     quantity_produced: Optional[float] = None
+    quantity_rejected: Optional[float] = None
     
     @validator('quantity_produced')
-    def validate_quantity(cls, v):
+    def validate_quantity_produced(cls, v):
         if v is not None and v < 0:
             raise ValueError('Quantity produced cannot be negative')
+        return v
+    
+    @validator('quantity_rejected')
+    def validate_quantity_rejected(cls, v, values):
+        if v is not None:
+            if v < 0:
+                raise ValueError('Quantity rejected cannot be negative')
+            
+            # Note: quantity_produced validation happens in the router
+            # where we have access to existing log data
+        
         return v
     
     @validator('date')

@@ -40,6 +40,13 @@ export default function Orders() {
     <div className="content-area" style={{ padding: '24px' }}>
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h2 className="page-title" style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>All Orders ({orders.length})</h2>
+        <button 
+          className="btn btn-primary" 
+          onClick={() => setCreatingOrder(true)}
+          data-testid="create-order-button"
+        >
+          <Plus size={16} /> Create Order
+        </button>
       </div>
 
       {orders.length === 0 ? (
@@ -49,9 +56,13 @@ export default function Orders() {
           <p style={{ color: '#8B949E', marginBottom: '24px' }}>
             Create your first order to start scheduling production
           </p>
-          <Link to="/app" className="btn btn-primary" data-testid="create-order-link">
+          <button 
+            className="btn btn-primary" 
+            onClick={() => setCreatingOrder(true)}
+            data-testid="create-order-empty-state-button"
+          >
             + Create Order
-          </Link>
+          </button>
         </div>
       ) : (
         <div className="orders-table-container" style={{ overflowX: 'auto' }}>

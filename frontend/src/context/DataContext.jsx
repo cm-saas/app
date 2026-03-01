@@ -24,6 +24,7 @@ export const DataProvider = ({ children }) => {
   const [workCenters, setWorkCenters] = useState([]);
   const [orders, setOrders] = useState([]);
   const [parts, setParts] = useState([]);
+  const [productionLogs, setProductionLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [rebuilding, setRebuilding] = useState(false);
 

@@ -63,8 +63,10 @@ export default function Orders() {
               <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
+                <th>Part Number</th>
                 <th>Qty (Orig/Stock/Net)</th>
                 <th>Priority</th>
+                <th>Start Date</th>
                 <th>Due Date</th>
                 <th>Completion</th>
                 <th>Status</th>
@@ -84,6 +86,7 @@ export default function Orders() {
                   <tr key={order.id}>
                     <td className="mono-text">{order.id.substring(0, 12)}...</td>
                     <td>{order.customer}</td>
+                    <td>{order.part_number || '-'}</td>
                     <td>
                       <div style={{ fontSize: '13px' }}>
                         <span style={{ color: 'var(--text-primary)' }}>{origQty}</span>

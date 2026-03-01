@@ -346,7 +346,8 @@ export default function Production() {
 function EditProductionLogModal({ log, order, onClose, onSave }) {
   const [formData, setFormData] = useState({
     date: log.date,
-    quantity_produced: log.quantity_produced
+    quantity_produced: log.quantity_produced,
+    quantity_rejected: log.quantity_rejected || 0
   });
 
   function getToday() {
@@ -366,9 +367,20 @@ function EditProductionLogModal({ log, order, onClose, onSave }) {
       return;
     }
 
+    if (formData.quantity_rejected < 0) {
+      alert('Quantity rejected cannot be negative');
+      return;
+    }
+
+    if (formData.quantity_rejected > formData.quantity_produced) {
+      alert('Quantity rejected cannot exceed quantity produced');
+      return;
+    }
+
     onSave({
       date: formData.date,
-      quantity_produced: parseFloat(formData.quantity_produced)
+      quantity_produced: parseFloat(formData.quantity_produced),
+      quantity_rejected: parseFloat(formData.quantity_rejected) || 0
     });
   };
 
@@ -410,6 +422,22 @@ function EditProductionLogModal({ log, order, onClose, onSave }) {
               step="any"
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Quantity Rejected</label>
+            <input
+              type="number"
+              value={formData.quantity_rejected}
+              onChange={(e) => setFormData({ ...formData, quantity_rejected: parseFloat(e.target.value) || 0 })}
+              className="form-input-modal"
+              min="0"
+              step="any"
+              placeholder="Optional"
+            />
+            <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+              Units that failed quality inspection
+            </small>
           </div>
 
           <div className="modal-actions">

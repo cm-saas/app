@@ -171,6 +171,7 @@ export default function Orders() {
         <EditOrderModal 
           order={editingOrder}
           workCenters={workCenters}
+          parts={parts}
           onClose={() => setEditingOrder(null)}
           onSave={(updates) => {
             editOrder(editingOrder.id, updates);

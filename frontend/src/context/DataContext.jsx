@@ -28,6 +28,23 @@ export const DataProvider = ({ children }) => {
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
 
+  // Calculate automatic order status based on conditions
+  const calculateOrderStatus = (order) => {
+    const today = new Date().toISOString().split("T")[0];
+
+    if (order.unscheduled) return "UNSCHEDULED";
+
+    if (order.net_required_quantity === 0) return "COMPLETED";
+
+    if (order.actual_units_completed >= order.original_quantity) return "COMPLETED";
+
+    if (today < order.start_date) return "PLANNED";
+
+    if (today >= order.start_date) return "IN_PROGRESS";
+
+    return "PLANNED";
+  };
+
   // Fetch data from API
   const fetchData = async () => {
     if (!isAuthenticated) {

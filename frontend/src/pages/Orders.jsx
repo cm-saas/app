@@ -5,7 +5,7 @@ import { calculateDeliveryRisk } from '../services/schedulingEngine';
 
 export default function Orders() {
   console.log("Orders mounted");
-  const { orders, workCenters, editOrder, deleteOrder, addOrder } = useData();
+  const { orders, workCenters, parts, editOrder, deleteOrder, addOrder } = useData();
   const [editingOrder, setEditingOrder] = useState(null);
   const [duplicatingOrder, setDuplicatingOrder] = useState(null);
   const [creatingOrder, setCreatingOrder] = useState(false);

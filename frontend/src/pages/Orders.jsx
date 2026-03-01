@@ -193,6 +193,7 @@ export default function Orders() {
       {creatingOrder && (
         <CreateOrderModal 
           workCenters={workCenters}
+          parts={parts}
           onClose={() => setCreatingOrder(false)}
           onSave={(newOrder) => {
             addOrder(newOrder);

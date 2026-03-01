@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
-import { Link } from 'react-router-dom';
 import { Edit2, Trash2, Package, Copy, Plus, X } from 'lucide-react';
 import { calculateDeliveryRisk } from '../services/schedulingEngine';
 

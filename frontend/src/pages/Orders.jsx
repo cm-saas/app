@@ -679,6 +679,58 @@ function EditOrderModal({ order, workCenters, onClose, onSave }) {
             </div>
           </div>
 
+          {/* Quality Metrics Section */}
+          {(order.total_produced > 0 || order.total_rejected > 0) && (
+            <div style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-default)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              marginTop: '20px',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: 'var(--text-primary)' }}>
+                Quality Metrics
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '12px' }}>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Produced</div>
+                  <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--brand-primary)' }}>
+                    {order.total_produced || 0}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Rejected</div>
+                  <div style={{ fontSize: '18px', fontWeight: '600', color: '#FF5252' }}>
+                    {order.total_rejected || 0}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Net Good</div>
+                  <div style={{ fontSize: '18px', fontWeight: '600', color: '#00C853' }}>
+                    {order.net_good || 0}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Remaining</div>
+                  <div style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                    {order.remaining_quantity || 0}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Rejection %</div>
+                  <div style={{ 
+                    fontSize: '18px', 
+                    fontWeight: '600', 
+                    color: (order.rejection_percentage || 0) > 5 ? '#FF5252' : '#00C853'
+                  }}>
+                    {(order.rejection_percentage || 0).toFixed(2)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Routing Steps */}
           <div style={{ marginTop: '24px', marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>

@@ -521,8 +521,10 @@ function CreateOrderModal({ workCenters, onClose, onSave }) {
 function EditOrderModal({ order, workCenters, onClose, onSave }) {
   const [formData, setFormData] = useState({
     customer: order.customer,
+    part_number: order.part_number || '',
     quantity: order.quantity,
     priority: order.priority,
+    start_date: order.start_date ? order.start_date.split('T')[0] : new Date().toISOString().split('T')[0],
     due_date: order.due_date.split('T')[0],
     status: order.status,
     routing: order.routing.map(step => ({ ...step }))

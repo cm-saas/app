@@ -16,6 +16,7 @@ import DashboardEnterprise from "./pages/DashboardEnterprise";
 import Orders from "./pages/Orders";
 import Capacity from "./pages/Capacity";
 import Risks from "./pages/Risks";
+import Parts from "./pages/Parts";
 
 function App() {
   return (

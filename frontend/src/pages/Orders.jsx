@@ -53,15 +53,8 @@ export default function Orders() {
           <Package size={48} style={{ color: '#6E7681', marginBottom: '16px' }} />
           <h3 style={{ color: '#E6EDF3', marginBottom: '8px' }}>No Orders Yet</h3>
           <p style={{ color: '#8B949E', marginBottom: '24px' }}>
-            Create your first order to start scheduling production
+            Click the "+ Create Order" button above to start scheduling production
           </p>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setCreatingOrder(true)}
-            data-testid="create-order-empty-state-button"
-          >
-            + Create Order
-          </button>
         </div>
       ) : (
         <div className="orders-table-container" style={{ overflowX: 'auto' }}>

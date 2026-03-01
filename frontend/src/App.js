@@ -18,6 +18,7 @@ import Capacity from "./pages/Capacity";
 import Risks from "./pages/Risks";
 import Parts from "./pages/Parts";
 import Production from "./pages/Production";
+import Quality from "./pages/Quality";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
                 <Route path="capacity" element={<Capacity />} />
                 <Route path="parts" element={<Parts />} />
                 <Route path="production" element={<Production />} />
+                <Route path="quality" element={<Quality />} />
                 <Route path="risks" element={<Risks />} />
               </Route>
               

@@ -70,21 +70,26 @@ async def create_production_log(log_data: ProductionLogCreate, current_user: dic
     if order.get("unscheduled", False):
         raise HTTPException(status_code=400, detail="Cannot log production for unscheduled orders")
     
-    # Calculate actual_units_completed from existing logs
+    # Calculate net_good from existing logs (produced - rejected)
     existing_logs = []
     async for log in production_logs_collection.find({"user_id": user_id, "order_id": log_data.order_id}):
         existing_logs.append(log)
     
-    actual_units_completed = sum(log.get("quantity_produced", 0) for log in existing_logs)
+    total_produced = sum(log.get("quantity_produced", 0) for log in existing_logs)
+    total_rejected = sum(log.get("quantity_rejected", 0) for log in existing_logs)
+    net_good = total_produced - total_rejected
+    
     net_required_quantity = order.get("net_required_quantity", order.get("quantity", 0))
-    remaining_quantity = net_required_quantity - actual_units_completed
+    remaining_quantity = net_required_quantity - net_good
     
     # Check if order is already completed
     if remaining_quantity <= 0:
         raise HTTPException(status_code=400, detail="Order is already completed")
     
-    # Check if logging would exceed remaining quantity
-    if log_data.quantity_produced > remaining_quantity:
+    # Check if logging would exceed remaining quantity (based on net_good)
+    # New net_good = current net_good + (new_produced - new_rejected)
+    new_net_good = net_good + (log_data.quantity_produced - log_data.quantity_rejected)
+    if new_net_good > net_required_quantity:
         raise HTTPException(
             status_code=400, 
             detail=f"Cannot exceed remaining quantity. Remaining: {remaining_quantity}"

@@ -587,16 +587,28 @@ function EditOrderModal({ order, workCenters, onClose, onSave }) {
             />
           </div>
 
+          <div className="form-group">
+            <label className="form-label">Part Number</label>
+            <input
+              type="text"
+              value={formData.part_number}
+              onChange={(e) => setFormData({ ...formData, part_number: e.target.value })}
+              className="form-input-modal"
+              required
+            />
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Quantity</label>
               <input
                 type="number"
                 value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, quantity: Math.max(1, parseInt(e.target.value, 10) || 1) })}
                 className="form-input-modal"
                 required
                 min="1"
+                step="1"
               />
             </div>
 
@@ -604,7 +616,7 @@ function EditOrderModal({ order, workCenters, onClose, onSave }) {
               <label className="form-label">Priority</label>
               <select
                 value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value, 10) })}
                 className="form-input-modal"
               >
                 <option value={3}>High (3)</option>
@@ -615,6 +627,17 @@ function EditOrderModal({ order, workCenters, onClose, onSave }) {
           </div>
 
           <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Start Date</label>
+              <input
+                type="date"
+                value={formData.start_date}
+                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                className="form-input-modal"
+                required
+              />
+            </div>
+
             <div className="form-group">
               <label className="form-label">Due Date</label>
               <input

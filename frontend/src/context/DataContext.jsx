@@ -100,6 +100,12 @@ export const DataProvider = ({ children }) => {
     
     // Run scheduling engine
     const result = rebuildSchedule(wcsWithCalendars, ords);
+    
+    // Apply automatic status logic to all orders
+    result.orders.forEach(order => {
+      order.status = calculateOrderStatus(order);
+    });
+    
     setWorkCenters(result.workCenters);
     setOrders(result.orders);
     

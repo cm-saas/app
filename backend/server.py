@@ -78,6 +78,9 @@ app.include_router(auth.router)
 # Include protected data router
 app.include_router(data.router)
 
+# Include parts router
+app.include_router(parts.router)
+
 # Include manufacturing routers (legacy - will be deprecated)
 app.include_router(orders.router)
 app.include_router(work_centers.router)

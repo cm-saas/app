@@ -9,6 +9,7 @@ export default function Orders() {
   const { orders, workCenters, editOrder, deleteOrder, addOrder } = useData();
   const [editingOrder, setEditingOrder] = useState(null);
   const [duplicatingOrder, setDuplicatingOrder] = useState(null);
+  const [creatingOrder, setCreatingOrder] = useState(false);
 
   const getPriorityLabel = (priority) => {
     switch(priority) {

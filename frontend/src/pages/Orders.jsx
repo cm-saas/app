@@ -645,13 +645,56 @@ function EditOrderModal({ order, workCenters, parts, onClose, onSave }) {
 
           <div className="form-group">
             <label className="form-label">Part Number</label>
-            <input
-              type="text"
-              value={formData.part_number}
-              onChange={(e) => setFormData({ ...formData, part_number: e.target.value })}
-              className="form-input-modal"
+            <Select
+              value={partOptions.find(opt => opt.value === formData.part_number)}
+              onChange={handlePartSelect}
+              options={partOptions}
+              placeholder="Select a part..."
+              isClearable
+              isSearchable
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  background: 'var(--bg-elevated)',
+                  borderColor: 'var(--border-default)',
+                  minHeight: '40px',
+                  '&:hover': {
+                    borderColor: 'var(--border-hover)'
+                  }
+                }),
+                menu: (base) => ({
+                  ...base,
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-default)',
+                  zIndex: 9999
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  background: state.isFocused ? 'var(--bg-hover)' : 'var(--bg-elevated)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    background: 'var(--bg-hover)'
+                  }
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  color: 'var(--text-primary)'
+                }),
+                input: (base) => ({
+                  ...base,
+                  color: 'var(--text-primary)'
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  color: 'var(--text-muted)'
+                })
+              }}
               required
             />
+            <small style={{ color: 'var(--text-muted)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+              Changing part number will NOT overwrite your existing routing
+            </small>
           </div>
 
           <div className="form-row">

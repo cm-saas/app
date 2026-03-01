@@ -77,11 +77,16 @@ async def update_part(part_id: str, part_data: PartUpdate, current_user: dict = 
     if not part:
         raise HTTPException(status_code=404, detail="Part not found")
     
-    # Check if updating part_number and if it conflicts with another part
-    if part_data.part_number and part_data.part_number != part["part_number"]:
+    # Normalize part_number if provided
+    normalized_part_number = None
+    if part_data.part_number:
+        normalized_part_number = part_data.part_number.strip().upper()
+    
+    # Check if updating part_number and if it conflicts with another part (case-insensitive)
+    if normalized_part_number and normalized_part_number != part["part_number"]:
         existing_part = await parts_collection.find_one({
             "user_id": user_id,
-            "part_number": part_data.part_number,
+            "part_number": normalized_part_number,
             "id": {"$ne": part_id}
         })
         if existing_part:
@@ -95,8 +100,8 @@ async def update_part(part_id: str, part_data: PartUpdate, current_user: dict = 
     # Build update dict
     update_dict = {"updated_at": datetime.utcnow().isoformat()}
     
-    if part_data.part_number:
-        update_dict["part_number"] = part_data.part_number
+    if normalized_part_number:
+        update_dict["part_number"] = normalized_part_number
     if part_data.description is not None:
         update_dict["description"] = part_data.description
     if part_data.default_routing is not None:

@@ -550,7 +550,7 @@ function CreateOrderModal({ workCenters, parts, onClose, onSave }) {
   );
 }
 
-function EditOrderModal({ order, workCenters, onClose, onSave }) {
+function EditOrderModal({ order, workCenters, parts, onClose, onSave }) {
   const [formData, setFormData] = useState({
     customer: order.customer,
     part_number: order.part_number || '',
@@ -560,6 +560,31 @@ function EditOrderModal({ order, workCenters, onClose, onSave }) {
     due_date: order.due_date.split('T')[0],
     routing: order.routing.map(step => ({ ...step }))
   });
+
+  // Prepare options for react-select
+  const partOptions = parts.map(part => ({
+    value: part.part_number,
+    label: `${part.part_number} - ${part.description}`
+  }));
+
+  // Add current part if it's not in the parts list (backward compatibility)
+  const currentPartExists = parts.some(p => p.part_number === order.part_number);
+  if (order.part_number && !currentPartExists) {
+    partOptions.unshift({
+      value: order.part_number,
+      label: order.part_number
+    });
+  }
+
+  // Handle part selection - DO NOT auto-overwrite routing when editing
+  const handlePartSelect = (selectedOption) => {
+    setFormData({ 
+      ...formData, 
+      part_number: selectedOption ? selectedOption.value : '' 
+    });
+    // Note: Unlike CreateOrderModal, we do NOT auto-fill routing here
+    // User's existing routing is preserved when editing
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

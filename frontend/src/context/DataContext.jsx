@@ -77,17 +77,30 @@ export const DataProvider = ({ children }) => {
       setParts(partsList);
       setProductionLogs(prodLogs);
 
-      // Calculate actual_units_completed and remaining_quantity for each order
+      // Calculate quality metrics and remaining_quantity for each order
       const ordersWithProduction = ords.map(order => {
         const orderLogs = prodLogs.filter(log => log.order_id === order.id);
-        const actual_units_completed = orderLogs.reduce((sum, log) => sum + log.quantity_produced, 0);
+        
+        // Calculate production metrics
+        const total_produced = orderLogs.reduce((sum, log) => sum + (log.quantity_produced || 0), 0);
+        const total_rejected = orderLogs.reduce((sum, log) => sum + (log.quantity_rejected || 0), 0);
+        const net_good = total_produced - total_rejected;
+        
+        // Calculate remaining quantity (based on net_good, not total_produced)
         const net_required = order.net_required_quantity !== undefined ? order.net_required_quantity : order.quantity;
-        const remaining_quantity = net_required - actual_units_completed;
+        const remaining_quantity = net_required - net_good;
+        
+        // Calculate rejection percentage
+        const rejection_percentage = total_produced > 0 ? (total_rejected / total_produced) * 100 : 0;
         
         return {
           ...order,
-          actual_units_completed,
-          remaining_quantity
+          total_produced,
+          total_rejected,
+          net_good,
+          remaining_quantity,
+          rejection_percentage,
+          actual_units_completed: net_good  // For backward compatibility with status logic
         };
       });
 

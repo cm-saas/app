@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 import { Edit2, Trash2, Package, Copy, Plus, X } from 'lucide-react';
 import { calculateDeliveryRisk } from '../services/schedulingEngine';
+import Select from 'react-select';
 
 export default function Orders() {
   console.log("Orders mounted");

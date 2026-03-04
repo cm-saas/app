@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext';
 import { Settings, Plus, X } from 'lucide-react';
 
 export default function Capacity() {
-  const { workCenters, editWorkCenter, addWorkCenter, addBreakdown, removeBreakdown, addOvertime } = useData();
+  const { workCenters, editWorkCenter, deleteWorkCenter, addWorkCenter, addBreakdown, removeBreakdown, updateOvertime } = useData();
   const [editingWC, setEditingWC] = useState(null);
   const [addingBreakdown, setAddingBreakdown] = useState(null);
   const [addingOvertime, setAddingOvertime] = useState(null);
@@ -70,7 +70,12 @@ export default function Capacity() {
               {wc.breakdowns && wc.breakdowns.length > 0 ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {wc.breakdowns.map((b, idx) => (
-                    <span key={idx} className="badge badge-danger" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span 
+                      key={idx} 
+                      className="badge badge-danger" 
+                      style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                      title={b.reason || 'Breakdown'}
+                    >
                       {b.date}
                       <button 
                         onClick={() => removeBreakdown(wc.id, b.date)}
@@ -121,6 +126,12 @@ export default function Capacity() {
             editWorkCenter(editingWC.id, updates);
             setEditingWC(null);
           }}
+          onDelete={() => {
+            if (window.confirm(`Are you sure you want to delete "${editingWC.name}"? This action cannot be undone.`)) {
+              deleteWorkCenter(editingWC.id);
+              setEditingWC(null);
+            }
+          }}
         />
       )}
 
@@ -128,8 +139,8 @@ export default function Capacity() {
         <AddBreakdownModal 
           wcId={addingBreakdown}
           onClose={() => setAddingBreakdown(null)}
-          onAdd={(date) => {
-            addBreakdown(addingBreakdown, date);
+          onAdd={(breakdownData) => {
+            addBreakdown(addingBreakdown, breakdownData);
             setAddingBreakdown(null);
           }}
         />
@@ -140,7 +151,7 @@ export default function Capacity() {
           wcId={addingOvertime}
           onClose={() => setAddingOvertime(null)}
           onAdd={(date, hours) => {
-            addOvertime(addingOvertime, date, hours);
+            updateOvertime(addingOvertime, date, hours);
             setAddingOvertime(null);
           }}
         />
@@ -159,8 +170,9 @@ export default function Capacity() {
   );
 }
 
-function EditWCModal({ wc, onClose, onSave }) {
+function EditWCModal({ wc, onClose, onSave, onDelete }) {
   const [formData, setFormData] = useState({
+    name: wc.name,
     shift_hours_per_day: wc.shift_hours_per_day,
     number_of_shifts: wc.number_of_shifts,
     efficiency_percent: wc.efficiency_percent,
@@ -170,8 +182,19 @@ function EditWCModal({ wc, onClose, onSave }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content-small" onClick={(e) => e.stopPropagation()}>
-        <h2 className="modal-title">Edit {wc.name}</h2>
+        <h2 className="modal-title">Edit Work Center</h2>
         <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="modal-form">
+          <div className="form-group">
+            <label className="form-label">Work Center Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="form-input-modal"
+              required
+            />
+          </div>
+
           <div className="form-group">
             <label className="form-label">Shift Hours/Day</label>
             <input
@@ -210,18 +233,6 @@ function EditWCModal({ wc, onClose, onSave }) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Cost per Hour (₹)</label>
-            <input
-              type="number"
-              value={formData.cost_per_hour || 0}
-              onChange={(e) => setFormData({ ...formData, cost_per_hour: parseFloat(e.target.value) })}
-              className="form-input-modal"
-              step="10"
-              min="0"
-            />
-          </div>
-
-          <div className="form-group">
             <label className="form-label">Parallel Units</label>
             <input
               type="number"
@@ -232,9 +243,23 @@ function EditWCModal({ wc, onClose, onSave }) {
             />
           </div>
 
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-cancel">Cancel</button>
-            <button type="submit" className="btn-submit">Save</button>
+          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
+            <button 
+              type="button" 
+              onClick={onDelete} 
+              className="btn-cancel"
+              style={{ 
+                background: '#FF5252', 
+                color: 'white',
+                border: 'none'
+              }}
+            >
+              Delete Work Center
+            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button type="button" onClick={onClose} className="btn-cancel">Cancel</button>
+              <button type="submit" className="btn-submit">Save Changes</button>
+            </div>
           </div>
         </form>
       </div>
@@ -243,26 +268,57 @@ function EditWCModal({ wc, onClose, onSave }) {
 }
 
 function AddBreakdownModal({ wcId, onClose, onAdd }) {
-  const [date, setDate] = useState('');
+  const [formData, setFormData] = useState({
+    start_date: '',
+    end_date: '',
+    reason: ''
+  });
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content-small" onClick={(e) => e.stopPropagation()}>
         <h2 className="modal-title">Add Breakdown</h2>
-        <form onSubmit={(e) => { e.preventDefault(); onAdd(date); }} className="modal-form">
+        <form onSubmit={(e) => { 
+          e.preventDefault(); 
+          onAdd(formData); 
+        }} className="modal-form">
           <div className="form-group">
-            <label className="form-label">Breakdown Date</label>
+            <label className="form-label">Start Date</label>
             <input
               type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={formData.start_date}
+              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
               className="form-input-modal"
               required
             />
           </div>
+          
+          <div className="form-group">
+            <label className="form-label">End Date</label>
+            <input
+              type="date"
+              value={formData.end_date}
+              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+              className="form-input-modal"
+              min={formData.start_date}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Reason (Optional)</label>
+            <input
+              type="text"
+              value={formData.reason}
+              onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+              className="form-input-modal"
+              placeholder="e.g., Maintenance, Equipment failure"
+            />
+          </div>
+
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-cancel">Cancel</button>
-            <button type="submit" className="btn-submit">Add</button>
+            <button type="submit" className="btn-submit">Add Breakdown</button>
           </div>
         </form>
       </div>

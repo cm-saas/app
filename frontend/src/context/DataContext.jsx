@@ -339,14 +339,28 @@ export const DataProvider = ({ children }) => {
   };
 
   // Add breakdown
-  const addBreakdown = async (wcId, date) => {
+  const addBreakdown = async (wcId, breakdownData) => {
     const updatedWCs = workCenters.map(wc => {
       if (wc.id !== wcId) return wc;
       
+      // Generate array of dates from start_date to end_date
+      const breakdownDates = [];
+      if (breakdownData.start_date && breakdownData.end_date) {
+        const start = new Date(breakdownData.start_date);
+        const end = new Date(breakdownData.end_date);
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          breakdownDates.push({
+            date: d.toISOString().split('T')[0],
+            reason: breakdownData.reason || ''
+          });
+        }
+      }
+      
       const updated = {
         ...wc,
-        breakdowns: [...(wc.breakdowns || []), { date }],
-        calendar: generateCalendar({ ...wc, breakdowns: [...(wc.breakdowns || []), { date }] })
+        breakdowns: [...(wc.breakdowns || []), ...breakdownDates],
+        calendar: generateCalendar({ ...wc, breakdowns: [...(wc.breakdowns || []), ...breakdownDates] })
       };
       
       // Update in API

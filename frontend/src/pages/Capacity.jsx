@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../context/DataContext';
 import { Settings, Plus, X } from 'lucide-react';
 
@@ -8,6 +8,13 @@ export default function Capacity() {
   const [addingBreakdown, setAddingBreakdown] = useState(null);
   const [addingOvertime, setAddingOvertime] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Debug: Log state changes
+  React.useEffect(() => {
+    if (editingWC) console.log('editingWC set:', editingWC);
+    if (addingBreakdown) console.log('addingBreakdown set:', addingBreakdown);
+    if (addingOvertime) console.log('addingOvertime set:', addingOvertime);
+  }, [editingWC, addingBreakdown, addingOvertime]);
 
   return (
     <div className="content-area" style={{ padding: '24px' }}>
@@ -32,6 +39,7 @@ export default function Capacity() {
                 className="btn-icon"
                 onClick={() => setEditingWC(wc)}
                 data-testid={`edit-wc-${wc.id}`}
+                style={{ cursor: 'pointer', position: 'relative', zIndex: 10 }}
               >
                 <Settings size={18} />
               </button>
@@ -62,7 +70,7 @@ export default function Capacity() {
                 <button 
                   className="btn-icon"
                   onClick={() => setAddingBreakdown(wc.id)}
-                  style={{ padding: '4px' }}
+                  style={{ padding: '4px', cursor: 'pointer', position: 'relative', zIndex: 10 }}
                 >
                   <Plus size={16} />
                 </button>
@@ -97,7 +105,7 @@ export default function Capacity() {
                 <button 
                   className="btn-icon"
                   onClick={() => setAddingOvertime(wc.id)}
-                  style={{ padding: '4px' }}
+                  style={{ padding: '4px', cursor: 'pointer', position: 'relative', zIndex: 10 }}
                 >
                   <Plus size={16} />
                 </button>

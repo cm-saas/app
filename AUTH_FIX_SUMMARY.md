@@ -2,8 +2,8 @@
 
 ## Issue Identified
 The frontend `.env` file had an incorrect `REACT_APP_BACKEND_URL` pointing to:
-- **OLD (Wrong)**: `https://scheduling-engine.preview.emergentagent.com`
-- **NEW (Fixed)**: `https://c0481bad-378a-432c-be4e-4e5e2a5bfaf2.preview.emergentagent.com`
+- **OLD (Wrong)**: `https://production-capacity.preview.emergentagent.com`
+- **NEW (Fixed)**: `https://production-capacity.preview.emergentagent.com`
 
 ## Fix Applied
 Updated `/app/fluxnex-project/frontend/.env` with the correct preview URL and restarted the frontend service.
@@ -30,7 +30,7 @@ curl -X POST http://localhost:8001/api/auth/login \
 
 **Profile Endpoint (/api/auth/me):**
 ```bash
-curl https://c0481bad-378a-432c-be4e-4e5e2a5bfaf2.preview.emergentagent.com/api/auth/me \
+curl https://production-capacity.preview.emergentagent.com/api/auth/me \
   -H "Authorization: Bearer <token>"
 ```
 **Result:** ✅ User profile retrieved successfully
@@ -81,7 +81,7 @@ JWT_SECRET="fluxnex_secret_key_2025_production_secure"
 
 ### Frontend `.env` (/app/fluxnex-project/frontend/.env)
 ```env
-REACT_APP_BACKEND_URL=https://c0481bad-378a-432c-be4e-4e5e2a5bfaf2.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://production-capacity.preview.emergentagent.com
 WDS_SOCKET_PORT=443
 ENABLE_HEALTH_CHECK=false
 ```
@@ -156,4 +156,4 @@ The issue was solely the misconfigured backend URL in the frontend .env file. Al
 **Action for User:**
 - Clear browser cache/localStorage if issues persist
 - Use the test credentials above or register a new account
-- Access the application at: https://c0481bad-378a-432c-be4e-4e5e2a5bfaf2.preview.emergentagent.com
+- Access the application at: https://production-capacity.preview.emergentagent.com
